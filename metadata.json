@@ -1,0 +1,7 @@
+{
+  "name": "Naija Legal Buddy",
+  "description": "A personal legal assistant providing clear, simplified guidance for everyday Nigerian legal situations, from police stops to landlord disputes.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
