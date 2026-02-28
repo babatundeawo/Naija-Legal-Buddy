@@ -1,15 +1,15 @@
 
 import React from 'react';
-import { ShieldAlert, Home, Briefcase, ShoppingCart, Users, Siren, Scale, BookOpen, FileText } from 'lucide-react';
+import { ShieldAlert, Home, Briefcase, ShoppingCart, Users, Siren } from 'lucide-react';
 import { Category, Language, DocumentTemplate } from './types';
 
 export const CATEGORIES = [
-  { id: 'traffic', name: Category.TRAFFIC, icon: <ShieldAlert className="w-6 h-6" />, color: 'bg-blue-100 text-blue-700' },
-  { id: 'landlord', name: Category.LANDLORD, icon: <Home className="w-6 h-6" />, color: 'bg-green-100 text-green-700' },
-  { id: 'workplace', name: Category.WORKPLACE, icon: <Briefcase className="w-6 h-6" />, color: 'bg-purple-100 text-purple-700' },
-  { id: 'consumer', name: Category.CONSUMER, icon: <ShoppingCart className="w-6 h-6" />, color: 'bg-orange-100 text-orange-700' },
-  { id: 'domestic', name: Category.DOMESTIC, icon: <Users className="w-6 h-6" />, color: 'bg-pink-100 text-pink-700' },
-  { id: 'emergency', name: Category.EMERGENCY, icon: <Siren className="w-6 h-6" />, color: 'bg-red-100 text-red-700' },
+  { id: 'traffic', name: Category.TRAFFIC, icon: <ShieldAlert className="w-5 h-5" />, color: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
+  { id: 'landlord', name: Category.LANDLORD, icon: <Home className="w-5 h-5" />, color: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
+  { id: 'workplace', name: Category.WORKPLACE, icon: <Briefcase className="w-5 h-5" />, color: 'bg-slate-50 text-slate-600 border-slate-200' },
+  { id: 'consumer', name: Category.CONSUMER, icon: <ShoppingCart className="w-5 h-5" />, color: 'bg-amber-50 text-amber-600 border-amber-100' },
+  { id: 'domestic', name: Category.DOMESTIC, icon: <Users className="w-5 h-5" />, color: 'bg-rose-50 text-rose-600 border-rose-100' },
+  { id: 'emergency', name: Category.EMERGENCY, icon: <Siren className="w-5 h-5" />, color: 'bg-red-50 text-red-600 border-red-100' },
 ];
 
 export const LANGUAGES: { name: Language; label: string }[] = [

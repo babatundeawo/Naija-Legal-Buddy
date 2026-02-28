@@ -15,7 +15,7 @@ export interface LegalAdvice {
   steps: string[];
   laws: { title: string; section: string; link?: string }[];
   templates?: { name: string; content: string }[];
-  contacts?: { name: string; info: string }[];
+  contacts?: { name: string; type: string; phone?: string; email?: string }[];
   groundingUrls?: string[];
 }
 
@@ -30,15 +30,16 @@ export interface DocumentTemplate {
   description: string;
   category: string;
   content: string; // Markdown or raw text with placeholders like {{name}}
-  fields: string[]; // List of placeholder keys
+  fields: { name: string; description: string }[]; // List of placeholder keys with descriptions
 }
 
 export interface SavedCase {
   id: string;
   title: string;
   timestamp: number;
-  advice: LegalAdvice;
-  status: 'pending' | 'resolved' | 'sent';
+  advice?: LegalAdvice;
+  documentContent?: string;
+  status: 'pending' | 'resolved' | 'sent' | 'in-progress' | 'archived';
 }
 
 export interface AppState {

@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", serif;
+}
+
+@layer base {
+  body {
+    @apply bg-stone-50 text-slate-900 antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Custom scrollbar for a premium feel */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-300;
+}
+
+.premium-card {
+  @apply bg-white border border-slate-100 shadow-sm rounded-3xl transition-all duration-300;
+}
+
+.premium-card:active {
+  @apply scale-[0.98] shadow-inner;
+}
+
+.touch-target {
+  @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+}
