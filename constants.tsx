@@ -84,7 +84,7 @@ Yours faithfully,
     id: 'employment-termination-response',
     name: 'Unfair Dismissal Notice',
     description: 'A response to an employer for summary dismissal without due process.',
-    category: 'Workplace',
+    category: 'Employment',
     fields: ['Company Name', 'HR Manager Name', 'Last Day Worked', 'Reason Given', 'Your Name'],
     content: `To: {{HR Manager Name}}
 {{Company Name}}

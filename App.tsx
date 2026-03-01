@@ -27,6 +27,9 @@ const App: React.FC = () => {
   
   const [selectedTemplate, setSelectedTemplate] = useState<DocumentTemplate | null>(null);
   const [templateValues, setTemplateValues] = useState<Record<string, string>>({});
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const userEmail = "tunspiderman@gmail.com";
 
   useEffect(() => {
     const stored = localStorage.getItem('naija_legal_cases');
@@ -98,6 +101,35 @@ const App: React.FC = () => {
     };
     recognition.onend = () => setIsRecording(false);
     recognition.start();
+  };
+
+  const handleSelectTemplate = (tmpl: DocumentTemplate) => {
+    setSelectedTemplate(tmpl);
+    const initialValues: Record<string, string> = {};
+    
+    // Infer name from email
+    const inferredName = userEmail.split('@')[0].split('.')[0];
+    const formattedName = inferredName.charAt(0).toUpperCase() + inferredName.slice(1);
+    
+    tmpl.fields.forEach(field => {
+      const lowerField = field.toLowerCase();
+      if (lowerField.includes('your name') || lowerField.includes('full name')) {
+        initialValues[field] = formattedName;
+      }
+    });
+    
+    setTemplateValues(initialValues);
+  };
+
+  const handleSaveCase = () => {
+    if (!advice) return;
+    const firstPart = state.history[0] || "Saved Case";
+    const defaultTitle = firstPart.length > 40 ? firstPart.substring(0, 40) + "..." : firstPart;
+    
+    const userTitle = prompt("Enter a title for this case:", defaultTitle);
+    const finalTitle = userTitle || defaultTitle;
+    
+    saveCase(advice, finalTitle);
   };
 
   const renderLanguageSelector = () => (
@@ -301,17 +333,35 @@ const App: React.FC = () => {
             <h2 className="text-3xl font-display font-bold text-slate-900 mb-2">Legal Documents</h2>
             <p className="text-slate-500 text-sm">Professional templates for Nigerian legal situations.</p>
           </div>
+
+          <div className="flex flex-wrap gap-2 mb-8">
+            <button 
+              onClick={() => setSelectedCategory(null)}
+              className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${!selectedCategory ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-400 border border-slate-100 hover:border-slate-200'}`}
+            >
+              All
+            </button>
+            {Array.from(new Set(DOCUMENT_TEMPLATES.map(t => t.category))).map(cat => (
+              <button 
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${selectedCategory === cat ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200/50' : 'bg-white text-slate-400 border border-slate-100 hover:border-slate-200'}`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
           <div className="grid grid-cols-1 gap-4">
-            {DOCUMENT_TEMPLATES.map((tmpl, idx) => (
+            {DOCUMENT_TEMPLATES
+              .filter(t => !selectedCategory || t.category === selectedCategory)
+              .map((tmpl, idx) => (
               <motion.button
                 key={tmpl.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                onClick={() => {
-                  setSelectedTemplate(tmpl);
-                  setTemplateValues({});
-                }}
+                onClick={() => handleSelectTemplate(tmpl)}
                 className="w-full text-left p-6 premium-card hover:border-emerald-500 group relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -473,7 +523,7 @@ const App: React.FC = () => {
 
           <div className="fixed bottom-10 left-6 right-6 flex gap-3 max-w-md mx-auto z-50">
             <button 
-              onClick={() => saveCase(advice, state.history[0] || "Saved Case")}
+              onClick={handleSaveCase}
               className="flex-1 bg-white border border-slate-100 text-slate-900 font-bold py-5 rounded-2xl shadow-2xl flex items-center justify-center gap-3 hover:bg-slate-50 transition-all text-sm touch-target"
             >
               <Clock className="w-5 h-5 text-emerald-600" /> Track Case

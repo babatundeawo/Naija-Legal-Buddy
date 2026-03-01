@@ -30,7 +30,7 @@ export interface DocumentTemplate {
   description: string;
   category: string;
   content: string; // Markdown or raw text with placeholders like {{name}}
-  fields: { name: string; description: string }[]; // List of placeholder keys with descriptions
+  fields: string[]; // List of placeholder keys
 }
 
 export interface SavedCase {
