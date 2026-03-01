@@ -8,7 +8,7 @@ import {
   ChevronRight, Sparkles, Gavel, Scale as ScaleIcon
 } from 'lucide-react';
 import { AppState, SavedCase, LegalAdvice, Language, DocumentTemplate, ClarificationQuestion } from './types';
-import { CATEGORIES, GLOSSARY, LANGUAGES, DOCUMENT_TEMPLATES } from './constants';
+import { CATEGORIES, GLOSSARY, LANGUAGES, DOCUMENT_TEMPLATES, LEGAL_GUIDES } from './constants';
 import { analyzeSituation } from './services/geminiService';
 
 const App: React.FC = () => {
@@ -19,6 +19,7 @@ const App: React.FC = () => {
     language: 'English'
   });
   const [input, setInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [advice, setAdvice] = useState<LegalAdvice | null>(null);
   const [clarification, setClarification] = useState<ClarificationQuestion | null>(null);
   const [savedCases, setSavedCases] = useState<SavedCase[]>([]);
@@ -44,12 +45,32 @@ const App: React.FC = () => {
       title,
       timestamp: Date.now(),
       advice,
-      status: 'pending'
+      status: 'pending',
+      notes: '',
+      attachments: []
     };
     const updated = [newCase, ...savedCases];
     setSavedCases(updated);
     localStorage.setItem('naija_legal_cases', JSON.stringify(updated));
     alert('Case saved to your tracker!');
+  };
+
+  const updateCaseNotes = (id: string, notes: string) => {
+    const updated = savedCases.map(c => c.id === id ? { ...c, notes } : c);
+    setSavedCases(updated);
+    localStorage.setItem('naija_legal_cases', JSON.stringify(updated));
+  };
+
+  const addCaseAttachment = (id: string, name: string, url: string) => {
+    const updated = savedCases.map(c => c.id === id ? { ...c, attachments: [...(c.attachments || []), { name, url }] } : c);
+    setSavedCases(updated);
+    localStorage.setItem('naija_legal_cases', JSON.stringify(updated));
+  };
+
+  const updateCaseStatus = (id: string, status: SavedCase['status']) => {
+    const updated = savedCases.map(c => c.id === id ? { ...c, status } : c);
+    setSavedCases(updated);
+    localStorage.setItem('naija_legal_cases', JSON.stringify(updated));
   };
 
   const handleSearch = async (query: string = input) => {
@@ -212,6 +233,23 @@ const App: React.FC = () => {
       <div className="space-y-4">
         <motion.button 
           whileHover={{ x: 5 }}
+          onClick={() => setState({ ...state, currentView: 'guides' })}
+          className="w-full flex items-center justify-between p-6 bg-indigo-600 rounded-3xl text-white shadow-xl shadow-indigo-200/50 group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 p-3 rounded-2xl">
+              <BookOpen className="w-6 h-6" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-bold text-lg">Legal Guides</h3>
+              <p className="text-indigo-100 text-xs">Landlord, Police, Rights, etc.</p>
+            </div>
+          </div>
+          <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+        </motion.button>
+
+        <motion.button 
+          whileHover={{ x: 5 }}
           onClick={() => setState({ ...state, currentView: 'emergency' })}
           className="w-full flex items-center justify-between p-6 bg-rose-600 rounded-3xl text-white shadow-xl shadow-rose-200/50 group"
         >
@@ -334,49 +372,68 @@ const App: React.FC = () => {
             <p className="text-slate-500 text-sm">Professional templates for Nigerian legal situations.</p>
           </div>
 
-          <div className="flex flex-wrap gap-2 mb-8">
-            <button 
-              onClick={() => setSelectedCategory(null)}
-              className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${!selectedCategory ? 'bg-slate-900 text-white shadow-lg' : 'bg-white text-slate-400 border border-slate-100 hover:border-slate-200'}`}
-            >
-              All
-            </button>
-            {Array.from(new Set(DOCUMENT_TEMPLATES.map(t => t.category))).map(cat => (
-              <button 
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${selectedCategory === cat ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200/50' : 'bg-white text-slate-400 border border-slate-100 hover:border-slate-200'}`}
-              >
-                {cat}
-              </button>
-            ))}
+          <div className="mb-8">
+            <h3 className="font-bold text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4">Select Category</h3>
+            <div className="flex flex-wrap gap-2">
+              {Array.from(new Set(DOCUMENT_TEMPLATES.map(t => t.category))).map(cat => (
+                <button 
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${selectedCategory === cat ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200/50' : 'bg-white text-slate-400 border border-slate-100 hover:border-slate-200'}`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            {DOCUMENT_TEMPLATES
-              .filter(t => !selectedCategory || t.category === selectedCategory)
-              .map((tmpl, idx) => (
-              <motion.button
-                key={tmpl.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                onClick={() => handleSelectTemplate(tmpl)}
-                className="w-full text-left p-6 premium-card hover:border-emerald-500 group relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <FileText className="w-12 h-12" />
+          {selectedCategory && (
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="relative mb-6">
+                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                  <Search className="w-4 h-4 text-slate-400" />
                 </div>
-                <div className="relative z-10">
-                  <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-[0.2em] bg-emerald-50 px-3 py-1 rounded-full mb-4 inline-block">
-                    {tmpl.category}
-                  </span>
-                  <h3 className="font-bold text-slate-900 mb-2 text-lg">{tmpl.name}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{tmpl.description}</p>
-                </div>
-              </motion.button>
-            ))}
-          </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={`Search in ${selectedCategory}...`}
+                  className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                {DOCUMENT_TEMPLATES
+                  .filter(t => t.category === selectedCategory)
+                  .filter(t => t.name.toLowerCase().includes(searchQuery.toLowerCase()) || t.description.toLowerCase().includes(searchQuery.toLowerCase()))
+                  .map((tmpl, idx) => (
+                  <motion.button
+                    key={tmpl.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    onClick={() => handleSelectTemplate(tmpl)}
+                    className="w-full text-left p-6 premium-card hover:border-emerald-500 group relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <FileText className="w-12 h-12" />
+                    </div>
+                    <div className="relative z-10">
+                      <h3 className="font-bold text-slate-900 mb-2 text-lg">{tmpl.name}</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{tmpl.description}</p>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {!selectedCategory && (
+            <div className="text-center py-12 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+              <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-400 text-sm font-medium">Please select a category above to view templates.</p>
+            </div>
+          )}
         </div>
       )}
     </motion.div>
@@ -579,25 +636,71 @@ const App: React.FC = () => {
             >
               <div className="flex justify-between items-start mb-4">
                 <h3 className="font-bold text-slate-900 line-clamp-1 flex-1 mr-4 text-lg">{c.title}</h3>
-                <span className={`text-[9px] px-3 py-1 rounded-full uppercase font-bold flex-shrink-0 tracking-wider ${
-                  c.status === 'resolved' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
-                }`}>
-                  {c.status}
-                </span>
+                <select
+                  value={c.status}
+                  onChange={(e) => updateCaseStatus(c.id, e.target.value as SavedCase['status'])}
+                  className={`text-[9px] px-3 py-1 rounded-full uppercase font-bold flex-shrink-0 tracking-wider outline-none border-none cursor-pointer ${
+                    c.status === 'resolved' ? 'bg-emerald-50 text-emerald-700' : 
+                    c.status === 'archived' ? 'bg-slate-100 text-slate-600' :
+                    c.status === 'in-progress' ? 'bg-blue-50 text-blue-700' :
+                    'bg-amber-50 text-amber-700'
+                  }`}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="archived">Archived</option>
+                </select>
               </div>
-              <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-6">
+              <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-4">
                 <Clock className="w-3 h-3" />
                 {new Date(c.timestamp).toLocaleDateString()}
               </div>
-              <button 
-                onClick={() => {
-                  setAdvice(c.advice);
-                  setState({ ...state, currentView: 'interaction' });
-                }}
-                className="w-full bg-slate-50 text-slate-900 font-bold py-3 rounded-xl hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 text-sm"
-              >
-                View Details <ChevronRight className="w-4 h-4" />
-              </button>
+
+              <div className="mb-4">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Notes</label>
+                <textarea
+                  value={c.notes || ''}
+                  onChange={(e) => updateCaseNotes(c.id, e.target.value)}
+                  placeholder="Add notes about this case..."
+                  className="w-full p-3 rounded-xl border border-slate-100 bg-slate-50 text-xs focus:bg-white focus:ring-1 focus:ring-emerald-500 outline-none transition-all resize-none h-20"
+                />
+              </div>
+
+              {c.attachments && c.attachments.length > 0 && (
+                <div className="mb-4">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Attachments</label>
+                  <div className="flex flex-wrap gap-2">
+                    {c.attachments.map((att, i) => (
+                      <div key={i} className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-[10px] font-medium text-slate-600">
+                        <FileText className="w-3 h-3" />
+                        {att.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => {
+                    const name = prompt("Attachment name:");
+                    if (name) addCaseAttachment(c.id, name, "#");
+                  }}
+                  className="flex-1 bg-white border border-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-50 transition-colors text-xs flex items-center justify-center gap-2"
+                >
+                  <Send className="w-3 h-3" /> Add Doc
+                </button>
+                <button 
+                  onClick={() => {
+                    setAdvice(c.advice || null);
+                    setState({ ...state, currentView: 'interaction' });
+                  }}
+                  className="flex-1 bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 text-xs"
+                >
+                  View Advice <ChevronRight className="w-3 h-3" />
+                </button>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -619,8 +722,23 @@ const App: React.FC = () => {
         <p className="text-slate-500 text-sm">Simplified legal terminology for Nigerians.</p>
       </div>
 
+      <div className="relative mb-8">
+        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+          <Search className="w-4 h-4 text-slate-400" />
+        </div>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search legal terms..."
+          className="w-full pl-10 pr-4 py-3 bg-white border border-slate-100 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm"
+        />
+      </div>
+
       <div className="space-y-4">
-        {GLOSSARY.map((item, i) => (
+        {GLOSSARY
+          .filter(item => item.term.toLowerCase().includes(searchQuery.toLowerCase()) || item.definition.toLowerCase().includes(searchQuery.toLowerCase()))
+          .map((item, i) => (
           <motion.div 
             key={i}
             initial={{ opacity: 0, y: 10 }}
@@ -633,6 +751,51 @@ const App: React.FC = () => {
               {item.term}
             </h3>
             <p className="text-slate-600 text-sm leading-relaxed font-medium">{item.definition}</p>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+
+  const renderGuides = () => (
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="max-w-md mx-auto px-6 py-12 pb-40"
+    >
+      <button 
+        onClick={() => setState({ ...state, currentView: 'home' })}
+        className="flex items-center text-slate-400 hover:text-slate-800 mb-8 transition-colors font-semibold text-sm"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
+      </button>
+
+      <div className="mb-10">
+        <h2 className="text-3xl font-display font-bold text-slate-900 mb-2">Legal Guides</h2>
+        <p className="text-slate-500 text-sm">Comprehensive guides on common legal issues in Nigeria.</p>
+      </div>
+
+      <div className="space-y-6">
+        {LEGAL_GUIDES.map((guide, idx) => (
+          <motion.div 
+            key={guide.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.1 }}
+            className="premium-card p-6"
+          >
+            <h3 className="text-xl font-bold text-slate-900 mb-2">{guide.title}</h3>
+            <p className="text-xs text-slate-500 mb-6">{guide.description}</p>
+            
+            <div className="space-y-4">
+              {guide.sections.map((section, sIdx) => (
+                <div key={sIdx} className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  <h4 className="font-bold text-sm text-slate-800 mb-2">{section.title}</h4>
+                  <p className="text-xs text-slate-600 leading-relaxed">{section.content}</p>
+                </div>
+              ))}
+            </div>
           </motion.div>
         ))}
       </div>
@@ -723,6 +886,7 @@ const App: React.FC = () => {
           {state.currentView === 'glossary' && renderGlossary()}
           {state.currentView === 'emergency' && renderEmergency()}
           {state.currentView === 'templates' && renderTemplates()}
+          {state.currentView === 'guides' && renderGuides()}
         </AnimatePresence>
       </main>
 
@@ -751,6 +915,7 @@ const App: React.FC = () => {
               <div className="space-y-2 flex-grow">
                 {[
                   { id: 'home', label: 'Home', icon: HomeIcon, color: 'text-emerald-600' },
+                  { id: 'guides', label: 'Legal Guides', icon: BookOpen, color: 'text-indigo-600' },
                   { id: 'templates', label: 'Forms Library', icon: FileText, color: 'text-blue-600' },
                   { id: 'tracker', label: 'Case Tracker', icon: Clock, color: 'text-amber-600' },
                   { id: 'glossary', label: 'Glossary', icon: BookOpen, color: 'text-indigo-600' },

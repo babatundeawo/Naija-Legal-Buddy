@@ -131,3 +131,101 @@ export const GLOSSARY = [
   { term: 'Power of Attorney', definition: 'A legal document that allows one person to act on behalf of another in legal or financial matters.' },
   { term: 'Fundamental Human Rights', definition: 'Basic rights and freedoms that every Nigerian is entitled to under Chapter IV of the Constitution.' },
 ];
+
+export const LEGAL_GUIDES = [
+  {
+    id: 'landlord-tenant',
+    title: 'Landlord-Tenant Disputes',
+    description: 'A comprehensive guide on eviction, rent, and repairs in Nigeria.',
+    sections: [
+      {
+        title: 'Eviction Process',
+        content: 'In Nigeria, a landlord cannot forcefully evict a tenant. They must follow the legal process: 1. Serve a valid Notice to Quit (6 months for yearly tenants, 1 month for monthly). 2. Serve a 7-day Notice of Owner\'s Intention to Recover Possession. 3. File a suit in court. Only a court bailiff can physically evict a tenant.'
+      },
+      {
+        title: 'Rent Increases',
+        content: 'Rent increases must be reasonable and usually require notice. A landlord cannot arbitrarily double the rent. If you feel an increase is unfair, you can challenge it at the Rent Tribunal.'
+      },
+      {
+        title: 'Repairs and Maintenance',
+        content: 'Landlords are generally responsible for structural repairs (roof, walls, external pipes). Tenants are responsible for internal maintenance. If a landlord refuses to make essential repairs, you can apply to the court for an order to repair or for permission to repair and deduct from rent.'
+      }
+    ]
+  },
+  {
+    id: 'police-stops',
+    title: 'Handling Police Stops',
+    description: 'Your rights and procedures during a police encounter in Nigeria.',
+    sections: [
+      {
+        title: 'Your Rights',
+        content: 'You have the right to remain silent. You have the right to be told why you are being stopped. You have the right to see the officer\'s ID card. You have the right to call your lawyer or family.'
+      },
+      {
+        title: 'Procedures',
+        content: 'Stay calm and polite. Show your ID if requested. Do not resist physically. If you are being searched, you have the right to have a witness present. Officers cannot search your phone without a warrant.'
+      },
+      {
+        title: 'What to do if Harassed',
+        content: 'Take note of the officer\'s name, badge number, and vehicle plate. Do not argue. Report the incident to the Police Complaints Commission or the nearest Area Command.'
+      }
+    ]
+  },
+  {
+    id: 'fundamental-rights',
+    title: 'Fundamental Legal Rights',
+    description: 'Key rights guaranteed to every Nigerian citizen.',
+    sections: [
+      {
+        title: 'Right to Liberty',
+        content: 'No person shall be deprived of their liberty except in accordance with the law. If arrested, you must be brought before a court within a reasonable time (usually 24-48 hours).'
+      },
+      {
+        title: 'Right to Fair Hearing',
+        content: 'Every person is entitled to a fair hearing within a reasonable time by a court or tribunal. You are presumed innocent until proven guilty.'
+      },
+      {
+        title: 'Right to Privacy',
+        content: 'The privacy of citizens, their homes, correspondence, telephone conversations, and telegraphic communications is guaranteed and protected.'
+      }
+    ]
+  },
+  {
+    id: 'consumer-rights',
+    title: 'Consumer Rights & Fraud',
+    description: 'Protection against faulty goods and unfair trade practices in Nigeria.',
+    sections: [
+      {
+        title: 'Right to Quality',
+        content: 'Under the Federal Competition and Consumer Protection Act (FCCPA), consumers have the right to goods that are of good quality and fit for their purpose. If a product is faulty, you have the right to a repair, replacement, or refund.'
+      },
+      {
+        title: 'Protection from Fraud',
+        content: 'Be wary of "too good to be true" offers. Always verify the identity of sellers. If you are a victim of fraud, report it to the FCCPC or the EFCC (for financial crimes).'
+      },
+      {
+        title: 'Unfair Trade Practices',
+        content: 'Businesses are prohibited from making false or misleading representations about their products. This includes fake discounts or false claims about product benefits.'
+      }
+    ]
+  },
+  {
+    id: 'workplace-issues',
+    title: 'Workplace Issues',
+    description: 'Salary rights, unfair dismissal, and working conditions in Nigeria.',
+    sections: [
+      {
+        title: 'Salary Rights',
+        content: 'The Labour Act requires employers to pay wages in legal tender. Deductions from wages are strictly regulated and generally require the employee\'s consent or a court order.'
+      },
+      {
+        title: 'Unfair Dismissal',
+        content: 'An employer must follow the terms of the employment contract and the Labour Act when terminating employment. Summary dismissal without a fair hearing is often considered unfair.'
+      },
+      {
+        title: 'Working Conditions',
+        content: 'Employees are entitled to a safe working environment, reasonable working hours, and rest periods. The Labour Act also provides for sick leave and maternity leave.'
+      }
+    ]
+  }
+];

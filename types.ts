@@ -39,11 +39,13 @@ export interface SavedCase {
   timestamp: number;
   advice?: LegalAdvice;
   documentContent?: string;
+  notes?: string;
+  attachments?: { name: string; url: string }[];
   status: 'pending' | 'resolved' | 'sent' | 'in-progress' | 'archived';
 }
 
 export interface AppState {
-  currentView: 'home' | 'interaction' | 'tracker' | 'glossary' | 'emergency' | 'templates';
+  currentView: 'home' | 'interaction' | 'tracker' | 'glossary' | 'emergency' | 'templates' | 'guides';
   history: string[];
   isSearching: boolean;
   language: Language;
